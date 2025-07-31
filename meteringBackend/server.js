@@ -114,7 +114,7 @@ let message= await client.messages
     body: 'Hello Saif! This SMS is sent using Node.js and Twilio Phone Number.',
     // from: '+14025425333',  // Twilio Phone Number
     from: twilioPhone,  // Twilio Phone Number
-    to: '+919889667456'    // Recipient Number (must be verified in trial mode)
+    to: '+919315718415'    // Recipient Number (must be verified in trial mode)
   })
   // .then(message => console.log('Message SID:', message.sid))
   // .catch(error => console.error('Error:', error));
