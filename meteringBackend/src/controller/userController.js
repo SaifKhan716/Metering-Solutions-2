@@ -18,7 +18,7 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const validated = updateUserSchema.parse(req.body);
-        console.log("======", req.body)
+        console.log("====0000==", req.body)
         const updated = await userService.updateUser(req.params.id, validated);
         res.json({ success: true, data: updated });
     } catch (err) {

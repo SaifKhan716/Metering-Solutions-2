@@ -434,6 +434,7 @@ import CurrentPowerChart from "../components/meterManagement/CurrentPowerChart";
 import { fetchAdminDailyConsumption, fetchFilteredChartData,fetchMeterListByAdmin } from "../redux/thunks/adminDashboardThunks";
 import { selectUserId } from '../redux/slice/authSlice'
 import { selectMeterList, selectLoading, selectDailyConsuption, selectError,selectFetchDashboardData} from '../redux/slice/adminDashboardSlice';
+// import toast from 'react-hot-toast';
 
 const mockCharts = [
   {
@@ -454,6 +455,7 @@ const Dashboard = () => {
   const [endDate, setEndDate] = useState(today); // Add endDate state
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState(23);
+  const [lastRefreshTime, setLastRefreshTime] = useState(null);
   const [filters, setFilters] = useState({
     status: "all",
     type: "all"
@@ -811,12 +813,48 @@ const Dashboard = () => {
     return chart;
   };
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setRefreshing(false);
-  };
+  // const handleRefresh = async () => {
+  //   setRefreshing(true);
 
+  //      dispatch(fetchDashboardData(adminId)),
+  //     dispatch(fetchAdminDailyConsumption(adminId)),
+  //     dispatch(fetchMeterListByAdmin(adminId)),
+  //     dispatch(fetchFilteredChartData({ adminId, from: startDate, to: endDate }))
+  //   // await new Promise((resolve) => setTimeout(resolve, 1000));
+  //   setRefreshing(false);
+  // };
+
+
+  const handleRefresh = async () => {
+  const now = new Date();
+  const fourMinutesInMs = 4 * 60 * 1000;
+  
+  // Check cooldown
+  if (lastRefreshTime && (now - lastRefreshTime) < fourMinutesInMs) {
+    const secondsLeft = Math.ceil((fourMinutesInMs - (now - lastRefreshTime)) / 1000);
+    toast.error(`Please wait ${Math.floor(secondsLeft / 60)}m ${secondsLeft % 60}s before refreshing again`);
+    return;
+  }
+
+  setRefreshing(true);
+  
+  try {
+    // Execute requests sequentially
+    await dispatch(fetchDashboardData(adminId));
+    await dispatch(fetchAdminDailyConsumption(adminId));
+    await dispatch(fetchMeterListByAdmin(adminId));
+    await dispatch(fetchFilteredChartData({ adminId, from: startDate, to: endDate }));
+    
+    // Update last refresh time
+    setLastRefreshTime(new Date());
+    toast.success('Data refreshed successfully!');
+  } catch (error) {
+    console.error("Refresh failed:", error);
+    toast.error('Refresh failed. Please try again.');
+  } finally {
+    setRefreshing(false);
+  }
+};
   const dismissAlert = (alertId) => {
     setAlerts(alerts.filter((alert) => alert._id !== alertId));
   };
@@ -1159,10 +1197,10 @@ const Dashboard = () => {
               </div>
               <div className="text-xs text-emerald-600">Active Meters</div>
             </div>
-            <button className="flex items-center px-4 py-2 bg-white/80 rounded-xl border border-emerald-200 hover:bg-white transition-colors">
+            {/* <button className="flex items-center px-4 py-2 bg-white/80 rounded-xl border border-emerald-200 hover:bg-white transition-colors">
               <Download className="text-emerald-600 mr-2" size={18} />
               <span className="text-emerald-700 font-medium">Export</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

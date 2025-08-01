@@ -41,7 +41,7 @@ import userMangementReducer from "../slice/userMangementSlice";
 import { adminDashboard } from "../../api/apiService";
 import adminDahboardReducer from "../slice/adminDashboardSlice";
 import superAdminMeterDataReducer from '../slice/superAdminMeterSlice'
-
+import notificationReducer from "../slice/notificationsSlice"
 const authPersistConfig = {
   key: "auth",
   storage,
@@ -58,7 +58,8 @@ const rootReducer = combineReducers({
   meter: meterReducer,
   usersMangement: userMangementReducer,
   adminDashboard: adminDahboardReducer,
-  meters:superAdminMeterDataReducer
+  meters:superAdminMeterDataReducer,
+     notifications: notificationReducer,
 });
 
 export default rootReducer;

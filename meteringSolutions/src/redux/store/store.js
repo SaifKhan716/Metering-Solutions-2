@@ -15,6 +15,8 @@
 // export default { store, persistor };
 
 // redux/store.js
+
+
 import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from "."; // assuming index.js is in redux/
 

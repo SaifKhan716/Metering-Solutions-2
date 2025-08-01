@@ -28,6 +28,7 @@ export const updateUserById = createAsyncThunk(
   "usersMangement/updateUserById",
   async ({ id, data }, { rejectWithValue }) => {
     try {
+      console.log("=====updateUserById thnnk=====",data)
       const response = await userManagement.updateUserById(id, data);
       return response.data.data;
     } catch (error) {
@@ -41,25 +42,44 @@ export const updateUserById = createAsyncThunk(
 );
 
 
+// export const createUser = createAsyncThunk(
+//   "usersMangement/createUser",
+//   async (data, { rejectWithValue }) => {
+//     try {
+//       console.log("====data===", data);
+//       const response = await userManagement.createUser(data);
+//       console.log("thunk response",response.data.data);
+//       return response.data.data; // Assuming API response structure: { success, data }
+      
+//     } catch (error) {
+//       const message =
+//         error.response?.data?.message ||
+//         error.message ||
+//         "Failed to create user";
+//       return rejectWithValue(message);
+//     }
+//   }
+// );
+
+
 export const createUser = createAsyncThunk(
   "usersMangement/createUser",
-  async (data, { rejectWithValue }) => {
+  async (userData, { rejectWithValue }) => {
     try {
-      console.log("====data===", data);
-      const response = await userManagement.createUser(data);
-      console.log("thunk response",response.data.data);
-      return response.data.data; // Assuming API response structure: { success, data }
-      
+      const response = await userManagement.createUser(userData);
+      if (response.data.success) {
+        return response.data.data; // Make sure this contains the full user object
+      }
+      throw new Error(response.data.message || "Failed to create user");
     } catch (error) {
-      const message =
+      return rejectWithValue(
         error.response?.data?.message ||
         error.message ||
-        "Failed to create user";
-      return rejectWithValue(message);
+        "Failed to create user"
+      );
     }
   }
 );
-
 export const deleteUserById = createAsyncThunk(
   "usersMangement/deleteUserById",
   async (id, { rejectWithValue }) => {

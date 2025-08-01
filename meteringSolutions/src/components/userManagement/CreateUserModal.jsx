@@ -195,10 +195,11 @@
 import React, { useState } from 'react';
 import Icons from '../icons/LucideIcons';
 import { useDispatch, useSelector } from 'react-redux';
-import { createUser } from '../../redux/thunks/userManagementThunks';
+// import { createUser } from '../../redux/thunks/userManagementThunks';
 import { toast } from 'react-toastify';
 import { userManagementLoading } from '../../redux/slice/userMangementSlice';
-
+import { useEffect } from 'react';
+import { createUser, fetchUsersByQuery } from '../../redux/thunks/userManagementThunks';
 const CreateUserModal = ({
     setShowCreateForm,
     roleTemplates,
@@ -291,35 +292,83 @@ const CreateUserModal = ({
         };
     };
 
+    // const handleCreateUser = async () => {
+    //     if (!validateCreateUserForm()) {
+    //         return;
+    //     }
+
+    //     try {
+    //         const pendingAction = generateActionHistoryEntry("pending");
+
+    //         const userData = {
+    //             name: createUserData.name,
+    //             email: createUserData.email,
+    //             // password: createUserData.password,
+    //             role: createUserData.role,
+    //             phonenumber: createUserData.role !== "super admin" ? createUserData.phone : undefined,
+    //             adminId: createUserData.role === "user" ? createUserData.adminId : undefined,
+    //             superAdminId: createUserData.role !== "super admin" ? createUserData.superAdminId : undefined,
+    //             actionHistory: [pendingAction],
+    //             status: "active",
+    //             firstLogin: createUserData.requirePasswordReset
+    //         };
+
+
+    //         const result = await dispatch(createUser(userData));
+
+    //         if (result.error) {
+    //             toast.error(result.error.message || "Failed to create user");
+    //             return;
+    //         }
+
+    //         setCreateUserData({
+    //             name: "",
+    //             email: "",
+    //             password: "",
+    //             phone: "",
+    //             role: "user",
+    //             adminId: currentAdmin?.adminId || currentAdmin?._id || "",
+    //             superAdminId: currentAdmin?.superAdminId || currentAdmin?._id || "",
+    //             sendWelcomeEmail: true,
+    //             requirePasswordReset: true,
+    //         });
+    //         setCreateUserErrors({});
+    //         setShowCreateForm(false);
+
+    //         toast.success("User created successfully!");
+
+    //     } catch (error) {
+    //         toast.error("An unexpected error occurred");
+    //         console.error("Error creating user:", error);
+    //     }
+    // };
+
+
     const handleCreateUser = async () => {
-        if (!validateCreateUserForm()) {
-            return;
-        }
+    if (!validateCreateUserForm()) {
+        return;
+    }
 
-        try {
-            const pendingAction = generateActionHistoryEntry("pending");
+    try {
+        const pendingAction = generateActionHistoryEntry("pending");
 
-            const userData = {
-                name: createUserData.name,
-                email: createUserData.email,
-                // password: createUserData.password,
-                role: createUserData.role,
-                phonenumber: createUserData.role !== "super admin" ? createUserData.phone : undefined,
-                adminId: createUserData.role === "user" ? createUserData.adminId : undefined,
-                superAdminId: createUserData.role !== "super admin" ? createUserData.superAdminId : undefined,
-                actionHistory: [pendingAction],
-                status: "active",
-                firstLogin: createUserData.requirePasswordReset
-            };
+        const userData = {
+            name: createUserData.name,
+            email: createUserData.email,
+            role: createUserData.role,
+            phonenumber: createUserData.role !== "super admin" ? createUserData.phone : undefined,
+            adminId: createUserData.role === "user" ? createUserData.adminId : undefined,
+            superAdminId: createUserData.role !== "super admin" ? createUserData.superAdminId : undefined,
+            actionHistory: [pendingAction],
+            status: "active",
+            firstLogin: createUserData.requirePasswordReset
+        };
 
-
-            const result = await dispatch(createUser(userData));
-
-            if (result.error) {
-                toast.error(result.error.message || "Failed to create user");
-                return;
-            }
-
+        const result = await dispatch(createUser(userData));
+        
+        // Check if the action was successful
+        if (createUser.fulfilled.match(result)) {
+            // Reset form
             setCreateUserData({
                 name: "",
                 email: "",
@@ -333,15 +382,27 @@ const CreateUserModal = ({
             });
             setCreateUserErrors({});
             setShowCreateForm(false);
-
+            
             toast.success("User created successfully!");
-
-        } catch (error) {
-            toast.error("An unexpected error occurred");
-            console.error("Error creating user:", error);
+            
+            // Optionally refetch users to ensure the list is up-to-date
+            dispatch(fetchUsersByQuery({
+                superAdminId: currentAdmin?.superAdminId || currentAdmin?._id,
+                adminId: currentAdmin?.adminId || currentAdmin?._id,
+                role: "",
+                search: ""
+            }));
+        } else if (result.error) {
+            toast.error(result.error.message || "Failed to create user");
         }
-    };
+    } catch (error) {
+        toast.error("An unexpected error occurred");
+        console.error("Error creating user:", error);
+    }
+};
+    useEffect(()=>{
 
+    },[])
     //   return (
     //     <div className="fixed inset-0 z-50 flex items-center justify-center bg-blue-100/30 backdrop-blur-sm px-2">
     //       <div className="bg-white/90 backdrop-blur-lg rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh]">

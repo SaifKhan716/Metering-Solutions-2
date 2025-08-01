@@ -66,233 +66,6 @@ const { formatPhoneNumber } = require("../utils/phoneFormater");
 //   },
 // };
 
-// const sendNotification = async ({ meterId, data}) => {
-//   try {
-//     const meter = await Meter.findById(meterId)
-//       .populate({
-//         path: "assingnedUserId",
-//         select:
-//           "-password -refreshToken -otp -otpExpiresAt -actionHistory -__v",
-//         populate: {
-//           path: "adminId",
-//           select:
-//             "-password -refreshToken -otp -otpExpiresAt -actionHistory -__v",
-//         },
-//       })
-//       .select("-__v");
-
-//     if (!meter) {
-//       console.error(`Meter not found for meterId: ${meterId}`);
-//       return;
-//     }
-
-//     const user = meter.assingnedUserId;
-//     const admin = user?.adminId;
-
-//     if (!user) {
-//       console.error("User not found for this meter");
-//       return;
-//     }
-
-//     const toEmail = user.email;
-//     const toPhone = user.phonenumber;
-//     const adminEmail = admin?.email;
-//     const adminPhone = admin?.phonenumber;
-
-//     const time = new Date();
-
-//     // for (const alertObj of tempor) {
-//     //   const alertType = alertObj.value;
-//     //   const config = ALERT_CONFIG[alertType];
-
-//     //   if (!config) {
-//     //     console.warn(`Alert config not found for type: ${alertType}`);
-//     //     continue;
-//     //   }
-
-//     //   const sendToConfig = config.sendTo;
-
-//     //   for (const recipient in sendToConfig) {
-//     //     const mode = sendToConfig[recipient]; // "Email" or "Text"
-
-//     //     let recipientEmail = null;
-//     //     let recipientPhone = null;
-//     //     let recipientId = null;
-
-//     //     if (recipient === "User") {
-//     //       recipientEmail = toEmail;
-//     //       recipientPhone = toPhone;
-//     //       recipientId = user._id;
-//     //     } else if (recipient === "Admin") {
-//     //       recipientEmail = adminEmail;
-//     //       recipientPhone = adminPhone;
-//     //       recipientId = admin?._id;
-//     //     }
-
-//     //     if (!recipientId) {
-//     //       console.warn(`Recipient ${recipient} details not found`);
-//     //       continue;
-//     //     }
-
-//     //     // Send Notification
-//     //     if (mode === "Email" && recipientEmail) {
-//     //       await sendEmail(
-//     //         recipientEmail,
-//     //         `Alert: ${alertType}`,
-//     //         config.message
-//     //       );
-//     //       console.log(`Email sent to ${recipient}: ${recipientEmail}`);
-//     //     }
-
-//     //     if (mode === "Text" && recipientPhone) {
-//     //       await sendSMS(recipientPhone, config.message);
-//     //       console.log(`SMS sent to ${recipient}: ${recipientPhone}`);
-//     //     }
-
-//     //     // // Save Notification in DB
-//     //     // await NotificationModel.updateOne(
-//     //     //   { userId: recipientId, meterId },
-//     //     //   {
-//     //     //     $push: {
-//     //     //       userNotification: {
-//     //     //         alertType,
-//     //     //         message: config.message,
-//     //     //         value: alertObj.unit,
-//     //     //         mode,
-//     //     //         time,
-//     //     //       },
-//     //     //     },
-//     //     //     $set: { lastNotificationDate: time },
-//     //     //   },
-//     //     //   { upsert: true }
-//     //     // );
-
-//     //     // console.log(`Notification saved for ${recipient}: ${recipientId} | Alert: ${alertType}`);
-
-//     //     const notificationPayload = {
-//     //       alertType,
-//     //       message: config.message,
-//     //       value: alertObj.unit,
-//     //       mode,
-//     //       time,
-//     //     };
-
-//     //     // Save or Update Notification in DB
-//     //     const updateResult = await NotificationModel.updateOne(
-//     //       { userId: recipientId, meterId },
-//     //       {
-//     //         $push: {
-//     //           userNotification: {
-//     //             $each: [notificationPayload],
-//     //             $position: 0, // Add to beginning of array
-//     //             $slice: 50, // Keep only latest 50 notifications (Optional Capping)
-//     //           },
-//     //         },
-//     //         $set: { lastNotificationDate: time },
-//     //       },
-//     //       { upsert: true }
-//     //     );
-
-//     //     if (updateResult.matchedCount > 0) {
-//     //       console.log(
-//     //         `Notification updated for ${recipient}: ${recipientId} | Alert: ${alertType}`
-//     //       );
-//     //     } else {
-//     //       console.log(
-//     //         `Notification created for ${recipient}: ${recipientId} | Alert: ${alertType}`
-//     //       );
-//     //     }
-//     //   }
-//     // }
-
-//     for (const alertObj of tempor) {
-//   const alertType = alertObj.value;
-//   const config = ALERT_CONFIG[alertType];
-
-//   if (!config) {
-//     console.warn(`Alert config not found for type: ${alertType}`);
-//     continue;
-//   }
-
-//   const sendToConfig = config.sendTo;
-
-//   // Prepare dynamic message by replacing placeholders
-//   const customMessage = config.message
-//     .replace(/{METER_ID}/g, meter.meterSerialNumber || "N/A")
-//     .replace(/{USER_ID}/g, user._id.toString())
-//     .replace(/{VALUE}/g, alertObj.unit || "");
-
-//   for (const recipient in sendToConfig) {
-//     const mode = sendToConfig[recipient]; // "Email" or "Text"
-
-//     let recipientEmail = null;
-//     let recipientPhone = null;
-//     let recipientId = null;
-
-//     if (recipient === "User") {
-//       recipientEmail = user.email;
-//       recipientPhone = user.phonenumber;
-//       recipientId = user._id;
-//     } else if (recipient === "Admin") {
-//       recipientEmail = admin?.email;
-//       recipientPhone = admin?.phonenumber;
-//       recipientId = admin?._id;
-//     }
-
-//     if (!recipientId) {
-//       console.warn(`Recipient ${recipient} details not found`);
-//       continue;
-//     }
-
-//     // Send Notification (Email/SMS)
-//     if (mode === "Email" && recipientEmail) {
-//       await sendEmail(recipientEmail, `Alert: ${alertType}`, customMessage);
-//       console.log(`Email sent to ${recipient}: ${recipientEmail}`);
-//     }
-
-//     if (mode === "Text" && recipientPhone) {
-//       await sendSMS(recipientPhone, customMessage);
-//       console.log(`SMS sent to ${recipient}: ${recipientPhone}`);
-//     }
-
-//     // Save Notification in DB
-//     const notificationPayload = {
-//       alertType,
-//       message: customMessage,
-//       value: alertObj.unit,
-//       mode,
-//       time,
-//     };
-
-//     const updateResult = await NotificationModel.updateOne(
-//       { userId: recipientId, meterId },
-//       {
-//         $push: {
-//           userNotification: {
-//             $each: [notificationPayload],
-//             $position: 0,
-//             $slice: 50,
-//           },
-//         },
-//         $set: { lastNotificationDate: time },
-//       },
-//       { upsert: true }
-//     );
-
-//     if (updateResult.matchedCount > 0) {
-//       console.log(`Notification updated for ${recipient}: ${recipientId} | Alert: ${alertType}`);
-//     } else {
-//       console.log(`Notification created for ${recipient}: ${recipientId} | Alert: ${alertType}`);
-//     }
-//   }
-// }
-
-//   } catch (err) {
-//     console.error("Failed to send notifications:", err.message);
-//     throw err;
-//   }
-// };
-
 const ALERT_CONFIG = {
   "Low Balance": {
     message:
@@ -447,6 +220,90 @@ const sendNotification = async ({ meterId, data }) => {
         time: new Date().toLocaleString(),
       });
 
+      //       for (const recipient in sendToConfig) {
+      //         const mode = sendToConfig[recipient]; // "Email" or "Text"
+
+      //         let recipientEmail = null;
+      //         let recipientPhone = null;
+      //         let recipientId = null;
+
+      //         if (recipient === "User") {
+      //           recipientEmail = toEmail;
+      //           recipientPhone = toPhone;
+      //           recipientId = user._id;
+      //         } else if (recipient === "Admin") {
+      //           recipientEmail = adminEmail;
+      //           recipientPhone = adminPhone;
+      //           recipientId = admin?._id;
+      //         }
+
+      //         if (!recipientId) {
+      //           console.warn(`Recipient ${recipient} details not found`);
+      //           continue;
+      //         }
+
+      //         // Send Notification (Email/SMS)
+      //         if (mode === "Email" && recipientEmail) {
+      //           // await sendEmail(recipientEmail, `Alert: ${alertType}`, customMessage);
+      //           await sendEmail(toEmail, `Alert: ${alertType}`, emailHtml, true);
+      //           console.log(`Email sent to ${recipient}: ${recipientEmail}`);
+      //         }
+
+      //         if (mode === "Text" && recipientPhone) {
+      // //           const smsContent = renderSMSTemplate({
+      // //             alertType,
+      // //             userId: user._id.toString(),
+      // //             meterId: meter.meterSerialNumber || "N/A",
+      // //             value: alertObj.unit != null ? alertObj.unit : "N/A",
+      // //             time: new Date().toLocaleString(),
+      // //             message: config.message
+      // //               .replace(/{METER_ID}/g, meter.meterSerialNumber || "N/A")
+      // //               .replace(/{USER_ID}/g, user._id.toString())
+      // //               .replace(/{VALUE}/g, alertObj.unit != null ? alertObj.unit : ""),
+      // //           });
+      // // console.log("===recipientPhone====smsContent==",recipientPhone,smsContent)
+
+      //  // await sendSMS(recipientPhone, smsContent);
+      //          await sendSMS(recipientPhone, customMessage);
+
+      //           console.log(`SMS sent to ${recipient}: ${recipientPhone}`);
+      //         }
+
+      //         // Save Notification in DB
+      //         const notificationPayload = {
+      //           alertType,
+      //           message: customMessage,
+      //           value: alertObj.unit,
+      //           mode,
+      //           time,
+      //         };
+
+      //         const updateResult = await NotificationModel.updateOne(
+      //           { userId: recipientId, meterId },
+      //           {
+      //             $push: {
+      //               userNotification: {
+      //                 $each: [notificationPayload],
+      //                 $position: 0,
+      //                 $slice: 50,
+      //               },
+      //             },
+      //             $set: { lastNotificationDate: time },
+      //           },
+      //           { upsert: true }
+      //         );
+
+      //         if (updateResult.matchedCount > 0) {
+      //           console.log(
+      //             `Notification updated for ${recipient}: ${recipientId} | Alert: ${alertType}`
+      //           );
+      //         } else {
+      //           console.log(
+      //             `Notification created for ${recipient}: ${recipientId} | Alert: ${alertType}`
+      //           );
+      //         }
+      //       }
+
       for (const recipient in sendToConfig) {
         const mode = sendToConfig[recipient]; // "Email" or "Text"
 
@@ -469,34 +326,15 @@ const sendNotification = async ({ meterId, data }) => {
           continue;
         }
 
-        // Send Notification (Email/SMS)
-        if (mode === "Email" && recipientEmail) {
-          // await sendEmail(recipientEmail, `Alert: ${alertType}`, customMessage);
-          await sendEmail(toEmail, `Alert: ${alertType}`, emailHtml, true);
-          console.log(`Email sent to ${recipient}: ${recipientEmail}`);
-        }
+        // Fetch Notification Status for recipient
+        const recipientNotificationConfig = await NotificationModel.findOne({
+          userId: recipientId,
+          meterId: meterId,
+        }).select("status");
 
-        if (mode === "Text" && recipientPhone) {
-//           const smsContent = renderSMSTemplate({
-//             alertType,
-//             userId: user._id.toString(),
-//             meterId: meter.meterSerialNumber || "N/A",
-//             value: alertObj.unit != null ? alertObj.unit : "N/A",
-//             time: new Date().toLocaleString(),
-//             message: config.message
-//               .replace(/{METER_ID}/g, meter.meterSerialNumber || "N/A")
-//               .replace(/{USER_ID}/g, user._id.toString())
-//               .replace(/{VALUE}/g, alertObj.unit != null ? alertObj.unit : ""),
-//           });
-// console.log("===recipientPhone====smsContent==",recipientPhone,smsContent)
+        const isNotificationEnabled =
+          recipientNotificationConfig?.status === "enabled";
 
- // await sendSMS(recipientPhone, smsContent);
-         await sendSMS(recipientPhone, customMessage);
-         
-          console.log(`SMS sent to ${recipient}: ${recipientPhone}`);
-        }
-
-        // Save Notification in DB
         const notificationPayload = {
           alertType,
           message: customMessage,
@@ -505,7 +343,8 @@ const sendNotification = async ({ meterId, data }) => {
           time,
         };
 
-        const updateResult = await NotificationModel.updateOne(
+        // Always Save Notification in DB
+        await NotificationModel.updateOne(
           { userId: recipientId, meterId },
           {
             $push: {
@@ -520,15 +359,32 @@ const sendNotification = async ({ meterId, data }) => {
           { upsert: true }
         );
 
-        if (updateResult.matchedCount > 0) {
+        if (!isNotificationEnabled) {
           console.log(
-            `Notification updated for ${recipient}: ${recipientId} | Alert: ${alertType}`
+            `Notification for ${recipient} is DISABLED, skipped sending`
           );
-        } else {
-          console.log(
-            `Notification created for ${recipient}: ${recipientId} | Alert: ${alertType}`
-          );
+          continue; // Skip sending notification if status is disabled
         }
+
+        // Send Notification (Email/SMS)
+        if (mode === "Email" && recipientEmail) {
+          await sendEmail(
+            recipientEmail,
+            `Alert: ${alertType}`,
+            emailHtml,
+            true
+          );
+          console.log(`Email sent to ${recipient}: ${recipientEmail}`);
+        }
+
+        if (mode === "Text" && recipientPhone) {
+          await sendSMS(recipientPhone, customMessage);
+          console.log(`SMS sent to ${recipient}: ${recipientPhone}`);
+        }
+
+        console.log(
+          `Notification saved for ${recipient}: ${recipientId} | Alert: ${alertType}`
+        );
       }
     }
   } catch (err) {

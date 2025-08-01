@@ -379,12 +379,12 @@ const UserDetailsPanel = ({
       // Generate action history entry
       // const actionHistoryEntry = generateActionHistoryEntry('pending');
       const actionHistoryEntry = generateActionHistoryEntry();
-      console.log("----", formData.newStatus);
+      
 
       // Prepare full update payload
       const fullUpdateData = {
-        //...updateData,
-        status: formData.newStatus,
+        ...updateData,
+        // status: formData.newStatus,
 
         actionHistory: [
           ...(selectedUser.actionHistory || []),
@@ -399,6 +399,7 @@ const UserDetailsPanel = ({
           data: fullUpdateData,
         })
       );
+      console.log("--formData----fullUpdateData-", formData,fullUpdateData);
 
       if (result.error) {
         // Generate failed action entry if update fails

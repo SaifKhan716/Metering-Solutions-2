@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+  baseURL: import.meta.env.VITE_BACKEND_URL ||"http://localhost:3000/api/v1",
   headers: {
     'Content-Type': 'application/json',
   },
@@ -95,4 +95,13 @@ export const adminDashboard = {
 const paymentApi = {
   getPaymentHistoryById :(meterId, params={})=> api.get(`user/get-payment-history-by/${meterId}`,{params})
 }
-export { userManagement, meterManagement, authApis, userDashboard, userApi, meterApi,paymentApi }
+
+
+const notificationApi = {
+  getAdminNotifications: (adminId) => api.get(`/notifications/admin/${adminId}`),
+  getSystemNotifications: (adminId) => api.get(`/notifications/system/${adminId}`),
+  getUserNotifications: (userId) => api.get(`/notifications/user/${userId}`),
+  toggleNotificationStatus: ({ notificationId, status }) =>
+    api.patch(`/notifications/${notificationId}/status`, { status }),
+};
+export { userManagement, meterManagement, authApis, userDashboard, userApi, meterApi,paymentApi ,  notificationApi }
