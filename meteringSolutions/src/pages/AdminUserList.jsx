@@ -100,7 +100,7 @@ const AdminUserList = () => {
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                {/* <tbody className="bg-white divide-y divide-gray-200">
                   {filteredUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-medium text-gray-750">{user.name}</td>
@@ -117,7 +117,35 @@ const AdminUserList = () => {
                       </td>
                     </tr>
                   ))}
-                </tbody>
+                </tbody> */}
+
+                <tbody className="bg-white divide-y divide-gray-200">
+  {filteredUsers.length > 0 ? (
+    filteredUsers.map((user) => (
+      <tr key={user.id} className="hover:bg-gray-50">
+        <td className="px-6 py-4 text-sm font-medium text-gray-750">{user.name}</td>
+        <td className="px-6 py-4 text-sm text-gray-500">{user.userId}</td>
+        <td className="px-6 py-4 text-sm text-gray-500">{user.email || 'N/A'}</td>
+        <td className="px-6 py-4 text-sm text-gray-500">{user.meters?.length || 0}</td>
+        <td className="px-6 py-4 text-right">
+          <button
+            onClick={() => handleViewUser(user)}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center"
+          >
+            <Eye className="w-4 h-4 mr-1" /> View
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="5" className="px-6 py-10 text-center text-gray-500 text-sm font-medium">
+        No Users Found
+      </td>
+    </tr>
+  )}
+</tbody>
+
               </table>
             </div>
           </div>
@@ -133,23 +161,7 @@ const AdminUserList = () => {
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to User List
           </button>
 
-          {/* <div className="bg-white rounded-lg shadow p-4 mb-4">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">User Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">User Name</label>
-                <p className="text-lg text-gray-900 font-medium mt-1">{selectedUser.name}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">User ID</label>
-                <p className="text-lg text-gray-900 font-medium mt-1">{selectedUser.userId}</p>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <p className="text-lg text-gray-900 font-medium mt-1">{selectedUser.email || 'N/A'}</p>
-              </div>
-            </div>
-          </div> */}
+        
 
           <div className="bg-white rounded-lg shadow p-4 mb-4">
   <h2 className="text-xl font-semibold text-gray-800 mb-2">User Information</h2>
@@ -170,66 +182,7 @@ const AdminUserList = () => {
 </div>
 
 
-          {/* {selectedUser?.meters?.map((meter, idx) => {
-            return (
-              <div key={idx} className="bg-white rounded-lg shadow mb-6">
-                <div className="px-6 py-4 border-b">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                    <Zap className="w-5 h-5 mr-2 text-yellow-500" /> {meter.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">{meter.meterType}</p>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="text-md font-semibold text-gray-800 flex items-center">
-                      <Activity className="w-4 h-4 mr-1 text-blue-500" /> Daily Data
-                    </h4>
-                    <div className="flex items-center space-x-2">
-                      <Filter className="w-4 h-4 text-gray-500" />
-                      <select
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
-                        className="text-sm border border-gray-300 rounded-md px-2 py-1"
-                      >
-                        <option value="7days">Last 7 Days</option>
-                        <option value="30days">Last 30 Days</option>
-                        <option value="3months">Last 3 Months</option>
-                        <option value="6months">Last 6 Months</option>
-                        <option value="1year">Last 1 Year</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {filterDataByDate(meter.dailyData).length > 0 ? (
-                    <table className="w-full text-sm text-left">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-2 text-gray-500">Date</th>
-                          <th className="px-4 py-2 text-gray-500">Total kWh</th>
-                          <th className="px-4 py-2 text-gray-500">Deduction</th>
-                          <th className="px-4 py-2 text-gray-500">EG</th>
-                          <th className="px-4 py-2 text-gray-500">DG</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filterDataByDate(meter.dailyData).map((entry, idx) => (
-                          <tr key={idx} className="hover:bg-gray-50">
-                            <td className="px-4 py-2 text-gray-900">{formatDate(entry.date)}</td>
-                            <td className="px-4 py-2 text-gray-900">{entry.totalKWh}</td>
-                            <td className="px-4 py-2 text-gray-900">{entry.totalDeduction}</td>
-                            <td className="px-4 py-2 text-gray-900">{entry.totalEG}</td>
-                            <td className="px-4 py-2 text-gray-900">{entry.totalDG}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <div className="text-gray-500 text-center py-6">No data available for selected range.</div>
-                  )}
-                </div>
-              </div>
-            );
-          })} */}
+        
 
 
           {selectedUser?.meters?.map((entry, idx) => {

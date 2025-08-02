@@ -173,6 +173,7 @@ const UserManagement = () => {
               </div>
 
               <div className="max-h-96 overflow-y-auto">
+{/*                 
                 {filteredUsers.map((user) => (
                   <UserCard
                     key={user._id}
@@ -188,7 +189,24 @@ const UserManagement = () => {
                     // }}
                     roleTemplates={roleTemplates}
                   />
-                ))}
+                ))} */}
+
+                {filteredUsers.length > 0 ? (
+    filteredUsers.map((user) => (
+      <UserCard
+        key={user._id}
+        user={user}
+        isSelected={selectedUser?._id === user._id}
+        onSelect={() => setSelectedUser(user)}
+        onEdit={() => handleEditUser(user)}
+        roleTemplates={roleTemplates}
+      />
+    ))
+  ) : (
+    <div className="flex items-center justify-center h-40 text-gray-500 font-medium">
+      No Users Found
+    </div>
+  )}
               </div>
             </div>
           </div>

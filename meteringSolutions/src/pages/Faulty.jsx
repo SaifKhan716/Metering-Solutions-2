@@ -7,7 +7,7 @@ import { selectUserId } from '../redux/slice/authSlice';
 import { selectMeterList, selectLoading, selectError } from '../redux/slice/adminDashboardSlice'
 
 
-const FaultyOffline = () => {
+const Faulty = () => {
     const [currentView, setCurrentView] = useState('main');
     const [selectedMeter, setSelectedMeter] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -24,7 +24,7 @@ const FaultyOffline = () => {
 
     const filteredMeters = adminMeterList.filter((meter) => {
         const status = meter.status?.toLowerCase();
-        const isOfflineOrFaulty = status === 'offline' || status === 'faulty';
+        const isOfflineOrFaulty = status === 'faulty';
 
         const matchesSearch =
             meter.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -89,7 +89,7 @@ const FaultyOffline = () => {
                         <div className="px-6 py-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <h2 className="text-xl font-semibold text-gray-800">Meters List</h2>
                             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                                <div className="flex items-center">
+                                {/* <div className="flex items-center">
                                     <Filter className="w-4 h-4 text-gray-500 mr-2" />
                                     <select
                                         value={statusFilter}
@@ -101,7 +101,7 @@ const FaultyOffline = () => {
                                         <option value="offline">Offline</option>
 
                                     </select>
-                                </div>
+                                </div> */}
                                 <input
                                     type="text"
                                     placeholder="Search by Name, Meter ID or Serial"
@@ -124,7 +124,7 @@ const FaultyOffline = () => {
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Assign Date</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                {/* <tbody className="bg-white divide-y divide-gray-200">
                                     {filteredMeters.map((meter) => (
                                         <tr key={meter._id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 text-sm font-medium text-gray-750">{meter.name}</td>
@@ -161,7 +161,49 @@ const FaultyOffline = () => {
 
                                         </tr>
                                     ))}
-                                </tbody>
+                                </tbody> */}
+
+                                <tbody className="bg-white divide-y divide-gray-200">
+  {filteredMeters.length > 0 ? (
+    filteredMeters.map((meter) => (
+      <tr key={meter._id} className="hover:bg-gray-50">
+        <td className="px-6 py-4 text-sm font-medium text-gray-750">{meter.name}</td>
+        <td className="px-6 py-4 text-sm text-gray-500">{meter.meterId}</td>
+        <td className="px-6 py-4 text-sm text-gray-500">{meter.type}</td>
+        <td className="px-6 py-4 text-sm">
+          <span className={getStatusBadge(meter.status)}>
+            {meter.status === 'online' ? (
+              <Wifi className="w-3 h-3 mr-1" />
+            ) : (
+              <WifiOff className="w-3 h-3 mr-1" />
+            )}
+            {meter.status.charAt(0).toUpperCase() + meter.status.slice(1)}
+          </span>
+        </td>
+        <td className="px-6 py-4 text-sm">
+          <span className={getAssignmentBadge(meter.isAssigned)}>
+            {meter.isAssigned ? (
+              <Link className="w-3 h-3 mr-1" />
+            ) : (
+              <Link2Off className="w-3 h-3 mr-1" />
+            )}
+            {meter.isAssigned ? 'Assigned' : 'Unassigned'}
+          </span>
+        </td>
+        <td className="px-6 py-4 text-sm text-gray-700 text-right">
+          {meter.userAssignedTimestamp ? formatDate(meter.userAssignedTimestamp) : '—'}
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="6" className="px-6 py-10 text-center text-gray-500 text-sm font-medium">
+        No Faulty Meters Found
+      </td>
+    </tr>
+  )}
+</tbody>
+
                             </table>
                         </div>
                     </div>
@@ -172,4 +214,4 @@ const FaultyOffline = () => {
 };
 
 
-export default FaultyOffline;
+export default Faulty;

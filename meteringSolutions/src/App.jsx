@@ -71,6 +71,7 @@ import React, { Suspense, lazy } from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import DashboardLayout from "./layout/DashboardLayout";
 import PrivateRoute from "./service/ProtectedRoute";
+// import Foulty from "./pages/Foulty";
 
 // Lazy-loaded components
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -93,9 +94,11 @@ const SignUpForm = lazy(() => import('./components/user/SignUpForm'));
 const SignIn = lazy(() => import('./components/user/LoginForm'));
 const AdminMeterList = lazy(() => import("./pages/AdminMeterList"));
 const AdminUserList = lazy(() => import("./pages/AdminUserList"));
-const FaultyOffline = lazy(() => import('./pages/FaultyOffline'));
+const Offline = lazy(() => import('./pages/Offline'));
+const Foulty = lazy(() => import('./pages/Faulty'));
 
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // You can replace this with a Spinner or Skeleton
 const Loader = () => <div>Loading...</div>;
 
@@ -123,8 +126,8 @@ const App = () => {
               <Route path="dashboard/:id" element={<AdminDashboard />} />
               <Route path='meters-list' element={<AdminMeterList />} />
               <Route path='user-list' element={<AdminUserList />} />
-              <Route path='offline-meters' element={<FaultyOffline />} />
-              <Route path='faulty-meters' element={<FaultyOffline />} />
+              <Route path='offline-meters' element={<Offline />} />
+              <Route path='faulty-meters' element={<Foulty />} />
               {/* <Route path='due-users' element={<AdminMeterList/>} />
               <Route path='due-balance' element={<AdminMeterList/>} /> */}
               <Route path="dashboard/:id" element={<AdminDashboard />} />
@@ -170,6 +173,19 @@ const App = () => {
           */}
         </Routes>
       </Suspense>
+
+       <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </HashRouter>
   );
 };
